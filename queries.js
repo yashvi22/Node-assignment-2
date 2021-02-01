@@ -17,7 +17,6 @@ const getCars = (request, response) => {
     })
 }
 
-
 //to get a car by it's id 
 const getCarById = (request, response) => {
     const id = parseInt(request.params.id)
@@ -83,7 +82,7 @@ const addCar = async(request, response) => {
     }
 }
 
-//t update car
+//to update car
 const updateCar = async(request, response) => {
     const id = parseInt(request.params.id)
     console.log(id)
@@ -135,8 +134,6 @@ const updateCar = async(request, response) => {
     }
 }
 
-
-
 //to delete car
 const deleteCar = (request, response) => {
     const id = parseInt(request.params.id)
@@ -149,11 +146,42 @@ const deleteCar = (request, response) => {
     })
 }
 
+//to add image of car
+const addCarImage = (request, response, next) => {
+    const id = parseInt(request.params.id)
 
+
+    var date = Date.now()
+    console.log(date)
+    var createddate = new Date().toDateString()
+    console.log(createddate)
+    const imagename = String(request.file.filename)
+    console.log(imagename)
+    const imagepath = String('http://localhost:3000/uploads/images/' + request.file.filename)
+    if (!request.file) {
+        response.status(500)
+        return next(err)
+    }
+    pool.query('insert into carimage (carid,imagename,createddate,imagepath) values($1,$2,$3,$4)', [id, imagename, createddate, imagepath])
+    response.json({ fileUrl: 'http://localhost:3000/uploads/images/' + request.file.filename });
+}
+
+//to get car with image
+const carWithImage = (request, response) => {
+    pool.query('select c.id as "Car Id",c.name as "Car Name",m.name as "Maker Name",mo.name as "Model Name",ci.imagename  as "Image Name",ci.imagepath as "Image Path"from  car c join make m on c.makeid =m.id join model mo on c.modelid =mo.id left join carimage ci on c.id = ci.carid order by c.id  asc ', (error, results) => {
+        if (error) {
+            console.log(error)
+        }
+        console.log(results.rows)
+        response.status(200).json(results.rows)
+    })
+}
 module.exports = {
     getCars,
     getCarById,
     deleteCar,
     addCar,
-    updateCar
+    updateCar,
+    addCarImage,
+    carWithImage
 }
