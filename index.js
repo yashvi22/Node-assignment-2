@@ -4,7 +4,7 @@ const db = require('./queries')
 
 
 const app = express()
-const port = 4000
+const port = 3000
 
 
 app.use(bodyParser.json())
@@ -20,6 +20,9 @@ app.get('/', (request, response) => {
 
 app.get('/car', db.getCars)
 app.get('/car/:id', db.getCarById)
+app.post('/car', db.addCar)
+app.put('/car/:id', db.updateCar)
+app.delete('/car/:id', db.deleteCar)
 
 app.listen(port, () => {
     console.log(`App running on port ${port}.`)
